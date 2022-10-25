@@ -1,0 +1,307 @@
+#!/bin/bash
+#!/bin/sh
+#######################################
+# In case of any errors (e.g. MySQL) just re-run the script. Nothing will be re-installed except for the packages with errors.
+#######################################
+#  Written by Anoop Singh from http://hostingshades.com/
+
+#COLORS
+# Reset
+Color_Off='\033[0m'       # Text Reset
+
+# Regular Colors
+Red='\033[0;31m'          # Red
+Green='\033[0;32m'        # Green
+Yellow='\033[0;33m'       # Yellow
+Blue='\033[0;34m'         # Blue
+Purple='\033[0;35m'       # Purple
+Cyan='\033[0;36m'         # Cyan
+White='\033[0;37m'        # White
+
+# Bold
+BBlack='\033[1;30m'       # Black
+BRed='\033[1;31m'         # Red
+BGreen='\033[1;32m'       # Green
+BYellow='\033[1;33m'      # Yellow
+BBlue='\033[1;34m'        # Blue
+BPurple='\033[1;35m'      # Purple
+BCyan='\033[1;36m'        # Cyan
+BWhite='\033[1;37m'       # White
+
+# Check if running as root  
+ if [ "$(id -u)" != "0" ]; then  
+   echo -e "$BRed This script must be run as root $Color_Off" 1>&2  
+   exit 1  
+ fi  
+
+echo -e "$BCyan                         ========================================================================="
+echo -e "$BCyan                                   Downloading and Installing HRN_LAMP (Official installer)..."
+echo -e "$BCyan                         ========================================================================="
+echo -e "$Color_Off"
+sleep 3
+
+# MACHINE_TYPE=`uname -m`
+# if [[ ${MACHINE_TYPE} == 'i686'|| ${MACHINE_TYPE} == 'i386' ]]; then
+# rpm -Uvh http://dl.fedoraproject.org/pub/epel/6/i386/epel-release-6-8.noarch.rpm
+# else
+# rpm -Uvh http://dl.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm
+# fi
+# Update packages and Upgrade system
+
+echo -e "$BCyan                         ========================================================================="
+echo -e "$BCyan                                   Update yum (default package-management utility for CentOS)..."
+echo -e "$BCyan                         ========================================================================="
+echo -e "$Color_Off"
+
+sleep 5
+yum update -y 
+yum install wget vim zip unzip -y
+
+
+
+echo -e "$BCyan                         ========================================================================="
+echo -e "$BCyan                                                PHP Installation Under Process......"
+echo -e "$BCyan                         ========================================================================="
+echo -e "$Color_Off"
+
+#Install Php 
+echo -e "$BCyan Press 1 and 2 for  $Color_Off"
+echo -e "$BCyan 1. PHP 7.4      2. PHP 8.0  $Color_Off"
+#echo -e "$BCyan 2. PHP 8.0  $Color_Off"
+
+read -e -p "$(echo -e $BWhite                  Please Select PHP Version .......? $Color_Off): " p
+case $p in
+        1)echo -e "$BCyan              Installing PHP 7.4 Under Process...... $Color_Off"
+                sudo yum install epel-release -y
+                sudo rpm -Uvh http://rpms.famillecollet.com/enterprise/remi-release-7.rpm
+                yum --enablerepo=remi-php74 install php -y
+                yum --enablerepo=remi-php74 install php-xml php-soap php-xmlrpc php-mbstring php-json php-gd php-mcrypt  php-cli php-curl php-common php-intl php-mysqli php-pdo_mysql php-openssl php-zip php-imap php-ldap php-pdo_mysql -y
+                cp /etc/php.ini  /etc/php.ini_original
+                sed -i 's/upload_max_filesize = 2M/upload_max_filesize = 200M/' /etc/php.ini
+                sed -i 's/memory_limit = 128M/memory_limit = 200M/' /etc/php.ini
+                echo -e "$Color_Off" ;;
+
+        2) echo -e "$BCyan              Installing PHP 8.0 Under Process...... $Color_Off"
+                sudo yum install epel-release -y
+                sudo rpm -Uvh http://rpms.famillecollet.com/enterprise/remi-release-7.rpm
+                yum --enablerepo=remi-php80 install php -y
+                yum --enablerepo=remi-php80 install php-xml php-soap php-xmlrpc php-mbstring php-json php-gd php-mcrypt  php-cli php-curl php-common php-intl php-mysqli php-pdo_mysql php-openssl php-zip php-imap php-ldap php-pdo_mysql -y
+                cp /etc/php.ini  /etc/php.ini_original
+                sed -i 's/upload_max_filesize = 2M/upload_max_filesize = 200M/' /etc/php.ini
+                sed -i 's/memory_limit = 128M/memory_limit = 200M/' /etc/php.ini
+                echo -e "$Color_Off" ;;
+
+        *) echo -e "$BCyan INVALID NUMBER! $Color_Off" ;;        
+esac
+
+
+
+
+
+
+echo -e "$BCyan                         ========================================================================="
+echo -e "$BCyan                                                PHP Installation Completed ......"
+echo -e "$BCyan                         ========================================================================="
+echo -e "$Color_Off"
+
+
+# Installing MYSQL
+echo -e "$BCyan                         ========================================================================="
+echo -e "$BCyan                                                MySQL Server Instalation........"
+echo -e "$BCyan                         ========================================================================="
+echo -e "$Color_Off"
+sleep 3
+
+echo -e "$BCyan We RECOMMEND MariaDB 10 $Color_Off"
+sleep 3
+echo -e "$BCyan Press 1 and 2 for  $Color_Off"
+
+echo -e "$BCyan 1. MariaDB 10     2. MySQL 8 $Color_Off"
+#echo -e "$BCyan 2. MySQL 8  $Color_Off"
+
+
+read -e -p "$(echo -e $BWhite                  Please Select MySQL .......? $Color_Off): " mysql
+case $mysql in
+        1) 
+            echo -e "$BCyan                         ========================================================================="
+            echo -e "$BCyan                                                MariaDB Server Setup Under Process..."
+            echo -e "$BCyan                         ========================================================================="
+            echo -e "$Color_Off"
+            
+
+echo "# MariaDB 10.5 CentOS repository list - created 2022-10-25 12:13 UTC
+# https://mariadb.org/download/
+[mariadb]
+name = MariaDB
+baseurl = https://mirrors.aliyun.com/mariadb/yum/10.5/centos7-amd64
+gpgkey=https://mirrors.aliyun.com/mariadb/yum/RPM-GPG-KEY-MariaDB
+gpgcheck=1
+" > /etc/yum.repos.d/MariaDB.repo
+
+            yum install -y mariadb-server
+            sudo systemctl start mariadb
+            sudo systemctl enable mariadb
+            # dbpass=$1
+            # echo -e "$BWhite Please Enter DB Root Password"
+            # read dbpass
+            read -e -p "$(echo -e $BWhite  Please Set MySQL Root Password $Color_Off) : " MYSQL_ROOT_PASSWORD
+            /usr/bin/mysqladmin -u root password $MYSQL_ROOT_PASSWORD
+            echo -e "$BCyan               Database Password Updated Successfully...... $Color_Off"
+            
+            echo -e "$BCyan                         ========================================================================="
+            echo -e "$BCyan                                                MariaDB Server Setup Completed..."
+            echo -e "$BCyan                         ========================================================================="
+            echo -e "$Color_Off"
+            echo -e "$Color_Off" ;;
+            
+        2) 
+            echo -e "$BCyan                         ========================================================================="
+            echo -e "$BCyan                                                MySQL 8 Server Setup Under Process..."
+            echo -e "$BCyan                         ========================================================================="
+            echo -e "$Color_Off"
+            
+
+            rpm -Uvh https://repo.mysql.com/mysql80-community-release-el7-3.noarch.rpm
+            sed -i 's/enabled=1/enabled=0/' /etc/yum.repos.d/mysql-community.repo
+            rpm --import https://repo.mysql.com/RPM-GPG-KEY-mysql-2022
+            yum --enablerepo=mysql80-community install mysql-community-server -y
+            systemctl start mysqld.service
+
+
+            # get Temporary root Password
+            root_temp_pass=$(sudo grep 'A temporary password' /var/log/mysqld.log |tail -1 |awk '{split($0,a,": "); print a[2]}')
+            # echo "root_temp_pass: " $root_temp_pass
+
+            read -e -p "$(echo -e $BWhite  Please Set MySQL Root Password $Color_Off) : " MYSQL_ROOT_PASSWORD
+echo "[client]
+user=root
+password=$MYSQL_ROOT_PASSWORD
+"> ~/.my.cnf 
+chmod 600 ~/.my.cnf
+
+            # mysql_secure_installation.sql
+echo "# Make sure that NOBODY can access the server without a password
+ALTER USER 'root'@'localhost' IDENTIFIED BY '$MYSQL_ROOT_PASSWORD';
+# Kill the anonymous users
+DELETE FROM mysql.user WHERE User='';
+# disallow remote login for root
+DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1');
+# Kill off the demo database
+DROP DATABASE IF EXISTS test;
+DELETE FROM mysql.db WHERE Db='test' OR Db='test\\_%';
+# Make our changes take effect
+FLUSH PRIVILEGES;
+" >  mysql_secure_installation.sql
+
+     
+            sudo mysql -uroot -p"$root_temp_pass" --connect-expired-password <mysql_secure_installation.sql
+
+            systemctl enable mysqld.service
+            mysql -u root  -e "UNINSTALL COMPONENT 'file://component_validate_password'";
+
+            echo -e "$BCyan                 Database Password Updated Successfully...... $Color_Off"
+            
+            echo -e "$BCyan                         ========================================================================="
+            echo -e "$BCyan                                                MySQL 8 Server Setup Completed..."
+            echo -e "$BCyan                         ========================================================================="
+            echo -e "$Color_Off"
+            echo -e "$Color_Off" ;;
+            
+            
+        *) echo -e "$BCyan INVALID NUMBER! $Color_Off" ;;
+esac
+
+#########
+
+ echo -e "$BCyan                         ========================================================================="
+echo -e "$BCyan                                                Please choose webserver"
+echo -e "$BCyan                         ========================================================================="
+echo -e "$Color_Off"
+
+echo -e "$BCyan                                                 We RECOMMEND Apache $Color_Off"
+echo -e "$BCyan                                                 Press 1 and 2 for  $Color_Off"
+echo -e "$BCyan 1. Apache       2. Ngnix  $Color_Off"              # echo -e "$BCyan 2. Ngnix  $Color_Off"
+#echo -e "$BCyan 2. Ngnix  $Color_Off"
+
+read -e -p "$(echo -e $BWhite                  Please Select Web Server .......? $Color_Off): " a
+case $a in
+        1) 
+echo -e "$BCyan                         ========================================================================="
+echo -e "$BCyan                                                Apache Server Setup Under Process......          "
+echo -e "$BCyan                         ========================================================================="
+echo -e "$Color_Off"
+
+yum install -y httpd 
+systemctl start httpd.service
+systemctl enable httpd.service
+
+echo -e "$BCyan                         ========================================================================="
+echo -e "$BCyan                                            Server Installation Successfully Completed           "
+echo -e "$BCyan                         ========================================================================="
+echo -e "$Color_Off" ;;
+
+        2) echo -e "$BCyan              ========================================================================="
+echo -e "$BCyan                                           Nginx Server Setup Under Process..."
+echo -e "$BCyan                         ========================================================================="
+echo -e "$Color_Off"
+        
+        yum install -y nginx
+        systemctl start nginx
+        sudo systemctl enable nginx
+
+#echo -e "$BCyan                         ========================================================================="
+#echo -e "$BCyan                                            Server Installation Successfully Completed          "
+#echo -e "$BCyan                         ========================================================================="
+echo -e "$Color_Off" ;;
+
+        *) echo -e "$BCyan INVALID NUMBER! $Color_Off" ;;
+esac
+
+
+#############################
+# Summery
+echo -e "$BCyan======================================================================================================================="
+echo -e "$BCyan                                            Server Installation Summary                                                "
+echo -e "$BCyan======================================================================================================================="
+
+
+case $a in
+        1) 
+echo -e "$BCyan======================================================================================================================="
+echo -e "$BCyan                                            Apache Has been Installed                                                  "
+echo -e "$BCyan======================================================================================================================="
+echo -e "$Color_Off" ;;        
+        2)
+echo -e "$BCyan======================================================================================================================="
+echo -e "$BCyan                                            Nginx Has been Installed                                                   "
+echo -e "$BCyan======================================================================================================================="
+echo -e "$Color_Off" ;;      
+esac
+
+case $p in
+        1)
+echo -e "$BCyan======================================================================================================================="
+echo -e "$BCyan                                            PHP 7.4 Has been Installed                                                 "
+echo -e "$BCyan======================================================================================================================="
+echo -e "$Color_Off" ;;        
+        2) 
+echo -e "$BCyan======================================================================================================================="
+echo -e "$BCyan                                            PHP 8.0 Has been Installed                                                 "
+echo -e "$BCyan======================================================================================================================="
+echo -e "$Color_Off" ;;                         
+esac
+
+case $mysql in
+        1)
+echo -e "$BCyan======================================================================================================================="
+echo -e "$BCyan                                            MariaDB 10.5 Has been Installed                                            "
+echo -e "$BCyan======================================================================================================================="
+echo -e "$Color_Off" ;;
+        2) 
+echo -e "$BCyan======================================================================================================================="
+echo -e "$BCyan                                           MySQL 8 Has been Installed                                                  "
+echo -e "$BCyan======================================================================================================================="
+echo -e "$Color_Off" ;;                
+esac
+ 
+ 
