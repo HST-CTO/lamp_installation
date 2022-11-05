@@ -3,7 +3,7 @@
 #######################################
 # In case of any errors (e.g. MySQL) just re-run the script. Nothing will be re-installed except for the packages with errors.
 #######################################
-#  Written by Anoop Singh from http://hostingshades.com/
+#  Written by Anoop Singh from https://www.hostingshades.com
 
 #COLORS
 # Reset
